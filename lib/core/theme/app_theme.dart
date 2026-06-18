@@ -8,20 +8,20 @@ class AppTheme {
   static const Color lightBackground = Color(0xFFF8FAFC);
   static const Color lightSurface = Colors.white;
   static const Color lightError = Color(0xFFEF4444);
-  
+
   // Dark Theme Colors
   static const Color darkPrimary = Color(0xFF818CF8);
   static const Color darkSecondary = Color(0xFFA78BFA);
   static const Color darkBackground = Color(0xFF0F172A);
   static const Color darkSurface = Color(0xFF1E293B);
   static const Color darkError = Color(0xFFF87171);
-  
+
   // Text Colors
   static const Color lightTextPrimary = Color(0xFF1E293B);
   static const Color lightTextSecondary = Color(0xFF64748B);
   static const Color darkTextPrimary = Color(0xFFF1F5F9);
   static const Color darkTextSecondary = Color(0xFF94A3B8);
-  
+
   /// Light Theme
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -38,7 +38,7 @@ class AppTheme {
       onSurface: lightTextPrimary,
       onError: Colors.white,
     ),
-    
+
     // AppBar Theme
     appBarTheme: const AppBarTheme(
       elevation: 0,
@@ -51,17 +51,15 @@ class AppTheme {
         fontWeight: FontWeight.w600,
       ),
     ),
-    
+
     // Card Theme
     cardTheme: CardThemeData(
       elevation: 2,
       color: lightSurface,
       shadowColor: Colors.black.withOpacity(0.05),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
-    
+
     // Input Decoration Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -88,14 +86,14 @@ class AppTheme {
       ),
       contentPadding: const EdgeInsets.all(16),
     ),
-    
+
     // FloatingActionButton Theme
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: lightPrimary,
       foregroundColor: Colors.white,
       elevation: 4,
     ),
-    
+
     // Bottom Navigation Bar Theme
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: lightSurface,
@@ -104,7 +102,7 @@ class AppTheme {
       elevation: 8,
       type: BottomNavigationBarType.fixed,
     ),
-    
+
     // Text Theme
     textTheme: const TextTheme(
       displayLarge: TextStyle(
@@ -137,21 +135,12 @@ class AppTheme {
         fontWeight: FontWeight.w500,
         color: lightTextPrimary,
       ),
-      bodyLarge: TextStyle(
-        fontSize: 16,
-        color: lightTextPrimary,
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 14,
-        color: lightTextPrimary,
-      ),
-      bodySmall: TextStyle(
-        fontSize: 12,
-        color: lightTextSecondary,
-      ),
+      bodyLarge: TextStyle(fontSize: 16, color: lightTextPrimary),
+      bodyMedium: TextStyle(fontSize: 14, color: lightTextPrimary),
+      bodySmall: TextStyle(fontSize: 12, color: lightTextSecondary),
     ),
   );
-  
+
   /// Dark Theme
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
@@ -168,7 +157,7 @@ class AppTheme {
       onSurface: darkTextPrimary,
       onError: darkBackground,
     ),
-    
+
     // AppBar Theme
     appBarTheme: const AppBarTheme(
       elevation: 0,
@@ -181,17 +170,15 @@ class AppTheme {
         fontWeight: FontWeight.w600,
       ),
     ),
-    
+
     // Card Theme
     cardTheme: CardThemeData(
       elevation: 2,
       color: darkSurface,
       shadowColor: Colors.black.withOpacity(0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
-    
+
     // Input Decoration Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -218,14 +205,14 @@ class AppTheme {
       ),
       contentPadding: const EdgeInsets.all(16),
     ),
-    
+
     // FloatingActionButton Theme
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: darkPrimary,
       foregroundColor: darkBackground,
       elevation: 4,
     ),
-    
+
     // Bottom Navigation Bar Theme
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: darkSurface,
@@ -234,7 +221,7 @@ class AppTheme {
       elevation: 8,
       type: BottomNavigationBarType.fixed,
     ),
-    
+
     // Text Theme
     textTheme: const TextTheme(
       displayLarge: TextStyle(
@@ -267,18 +254,9 @@ class AppTheme {
         fontWeight: FontWeight.w500,
         color: darkTextPrimary,
       ),
-      bodyLarge: TextStyle(
-        fontSize: 16,
-        color: darkTextPrimary,
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 14,
-        color: darkTextPrimary,
-      ),
-      bodySmall: TextStyle(
-        fontSize: 12,
-        color: darkTextSecondary,
-      ),
+      bodyLarge: TextStyle(fontSize: 16, color: darkTextPrimary),
+      bodyMedium: TextStyle(fontSize: 14, color: darkTextPrimary),
+      bodySmall: TextStyle(fontSize: 12, color: darkTextSecondary),
     ),
   );
 }

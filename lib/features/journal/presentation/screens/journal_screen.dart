@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/color_palette.dart';
 import '../../domain/entities/journal_entry.dart';
@@ -76,7 +77,9 @@ class _JournalScreenState extends State<JournalScreen> {
                           icon: const Icon(Icons.chevron_left),
                           onPressed: () {
                             setState(() {
-                              _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                              _selectedDate = _selectedDate.subtract(
+                                const Duration(days: 1),
+                              );
                             });
                             _loadEntriesForDate(_selectedDate);
                           },
@@ -85,7 +88,9 @@ class _JournalScreenState extends State<JournalScreen> {
                           icon: const Icon(Icons.chevron_right),
                           onPressed: () {
                             setState(() {
-                              _selectedDate = _selectedDate.add(const Duration(days: 1));
+                              _selectedDate = _selectedDate.add(
+                                const Duration(days: 1),
+                              );
                             });
                             _loadEntriesForDate(_selectedDate);
                           },
@@ -129,7 +134,9 @@ class _JournalScreenState extends State<JournalScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text('Add Entry'),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(AppConstants.mediumPadding),
+                        padding: const EdgeInsets.all(
+                          AppConstants.mediumPadding,
+                        ),
                       ),
                     ),
                   ],
@@ -145,9 +152,7 @@ class _JournalScreenState extends State<JournalScreen> {
             child: BlocBuilder<JournalBloc, JournalState>(
               builder: (context, state) {
                 if (state is JournalLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (state is JournalError) {
@@ -168,7 +173,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     _selectedDate.month,
                     _selectedDate.day,
                   );
-                  
+
                   final todayEntries = state.entries.where((entry) {
                     final entryDate = DateTime(
                       entry.date.year,
@@ -210,45 +215,65 @@ class _JournalScreenState extends State<JournalScreen> {
                     itemCount: todayEntries.length,
                     itemBuilder: (context, index) {
                       final entry = todayEntries[index];
-                      final cardColor = ColorPalette.getColorById(entry.id, prefix: 'journal_');
-                      final isDark = Theme.of(context).brightness == Brightness.dark;
-                      
+                      final cardColor = ColorPalette.getColorById(
+                        entry.id,
+                        prefix: 'journal_',
+                      );
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
+
                       return Card(
-                        margin: const EdgeInsets.only(bottom: AppConstants.mediumPadding),
+                        margin: const EdgeInsets.only(
+                          bottom: AppConstants.mediumPadding,
+                        ),
                         color: cardColor.withOpacity(isDark ? 0.15 : 0.1),
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
+                            borderRadius: BorderRadius.circular(
+                              AppConstants.mediumRadius,
+                            ),
                             border: Border.all(
                               color: cardColor.withOpacity(0.3),
                               width: 2,
                             ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(AppConstants.mediumPadding),
+                            padding: const EdgeInsets.all(
+                              AppConstants.mediumPadding,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      DateFormat('HH:mm').format(entry.createdAt),
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: cardColor,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      DateFormat(
+                                        'HH:mm',
+                                      ).format(entry.createdAt),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: cardColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                     IconButton(
                                       icon: Icon(
                                         Icons.delete_outline,
-                                        color: Theme.of(context).colorScheme.error,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.error,
                                       ),
                                       onPressed: () => _deleteEntry(entry.id),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: AppConstants.smallPadding),
+                                const SizedBox(
+                                  height: AppConstants.smallPadding,
+                                ),
                                 Text(
                                   entry.content,
                                   style: Theme.of(context).textTheme.bodyLarge,
@@ -293,11 +318,13 @@ class _JournalScreenState extends State<JournalScreen> {
 
     final now = DateTime.now();
     final entry = JournalEntry(
-      id: now.millisecondsSinceEpoch.toString(),
+      id: const Uuid().v4(),
       date: _selectedDate,
       content: content,
       createdAt: now,
       updatedAt: now,
+      isSynced: false,
+      isDeleted: false,
     );
 
     context.read<JournalBloc>().add(SaveJournalEntryEvent(entry: entry));

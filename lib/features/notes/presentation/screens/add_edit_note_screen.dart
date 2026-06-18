@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/note.dart';
 import '../bloc/notes_bloc.dart';
@@ -48,10 +49,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
       appBar: AppBar(
         title: Text(_isEditing ? 'Edit Note' : 'New Note'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: _saveNote,
-          ),
+          IconButton(icon: const Icon(Icons.check), onPressed: _saveNote),
         ],
       ),
       body: SingleChildScrollView(
@@ -76,7 +74,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                 },
               ),
               const SizedBox(height: AppConstants.mediumPadding),
-              
+
               // Description field
               TextFormField(
                 controller: _descriptionController,
@@ -94,11 +92,13 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                 },
               ),
               const SizedBox(height: AppConstants.mediumPadding),
-              
+
               // Image section
               if (_imagePath != null) ...[
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
+                  borderRadius: BorderRadius.circular(
+                    AppConstants.mediumRadius,
+                  ),
                   child: Image.file(
                     File(_imagePath!),
                     height: 200,
@@ -117,7 +117,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                 ),
                 const SizedBox(height: AppConstants.mediumPadding),
               ],
-              
+
               // Add image button
               if (_imagePath == null)
                 OutlinedButton.icon(
@@ -140,7 +140,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         maxHeight: 1024,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         setState(() {
           _imagePath = image.path;
@@ -162,12 +162,16 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
     if (_formKey.currentState!.validate()) {
       final now = DateTime.now();
       final note = Note(
-        id: _isEditing ? widget.note!.id : now.millisecondsSinceEpoch.toString(),
+        id: _isEditing ? widget.note!.id : const Uuid().v4(),
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         imagePath: _imagePath,
+        localImagePath: _imagePath,
+        remoteImageUrl: _isEditing ? widget.note!.remoteImageUrl : null,
         createdAt: _isEditing ? widget.note!.createdAt : now,
         updatedAt: now,
+        isSynced: false,
+        isDeleted: false,
       );
 
       if (_isEditing) {

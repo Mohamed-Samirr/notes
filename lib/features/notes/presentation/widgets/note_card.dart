@@ -22,17 +22,14 @@ class NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cardColor = ColorPalette.getColorById(note.id, prefix: 'note_');
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: AppConstants.mediumPadding),
       color: cardColor.withOpacity(isDark ? 0.15 : 0.1),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
-          border: Border.all(
-            color: cardColor.withOpacity(0.3),
-            width: 2,
-          ),
+          border: Border.all(color: cardColor.withOpacity(0.3), width: 2),
         ),
         child: InkWell(
           onTap: onTap,
@@ -45,7 +42,9 @@ class NoteCard extends StatelessWidget {
                 // Image (if exists)
                 if (note.imagePath != null) ...[
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(AppConstants.smallRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.smallRadius,
+                    ),
                     child: Image.file(
                       File(note.imagePath!),
                       height: 150,
@@ -55,7 +54,7 @@ class NoteCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppConstants.mediumPadding),
                 ],
-                
+
                 // Title
                 Text(
                   note.title,
@@ -67,7 +66,7 @@ class NoteCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppConstants.smallPadding),
-                
+
                 // Description
                 Text(
                   note.description,
@@ -76,7 +75,7 @@ class NoteCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppConstants.mediumPadding),
-                
+
                 // Date and delete button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

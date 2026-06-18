@@ -14,7 +14,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final UpdateTaskUseCase updateTaskUseCase;
   final DeleteTaskUseCase deleteTaskUseCase;
   final ToggleTaskCompletionUseCase toggleTaskCompletionUseCase;
-  
+
   TodoBloc({
     required this.getAllTasksUseCase,
     required this.getTasksByDateUseCase,
@@ -30,7 +30,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     on<DeleteTaskEvent>(_onDeleteTask);
     on<ToggleTaskCompletionEvent>(_onToggleTaskCompletion);
   }
-  
+
   /// Load all tasks
   Future<void> _onLoadAllTasks(
     LoadAllTasksEvent event,
@@ -44,7 +44,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       emit(TodoError(message: 'Failed to load tasks: ${e.toString()}'));
     }
   }
-  
+
   /// Load tasks for a specific date
   Future<void> _onLoadTasksByDate(
     LoadTasksByDateEvent event,
@@ -58,12 +58,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       emit(TodoError(message: 'Failed to load tasks: ${e.toString()}'));
     }
   }
-  
+
   /// Add a new task
-  Future<void> _onAddTask(
-    AddTaskEvent event,
-    Emitter<TodoState> emit,
-  ) async {
+  Future<void> _onAddTask(AddTaskEvent event, Emitter<TodoState> emit) async {
     try {
       await addTaskUseCase(event.task);
       // Reload tasks for the task's date
@@ -73,7 +70,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       emit(TodoError(message: 'Failed to add task: ${e.toString()}'));
     }
   }
-  
+
   /// Update an existing task
   Future<void> _onUpdateTask(
     UpdateTaskEvent event,
@@ -88,7 +85,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       emit(TodoError(message: 'Failed to update task: ${e.toString()}'));
     }
   }
-  
+
   /// Delete a task
   Future<void> _onDeleteTask(
     DeleteTaskEvent event,
@@ -103,7 +100,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       emit(TodoError(message: 'Failed to delete task: ${e.toString()}'));
     }
   }
-  
+
   /// Toggle task completion status
   Future<void> _onToggleTaskCompletion(
     ToggleTaskCompletionEvent event,

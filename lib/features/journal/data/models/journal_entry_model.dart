@@ -8,27 +8,78 @@ part 'journal_entry_model.g.dart';
 class JournalEntryModel extends HiveObject {
   @HiveField(0)
   final String id;
-  
+
   @HiveField(1)
   final DateTime date;
-  
+
   @HiveField(2)
   final String content;
-  
+
   @HiveField(3)
   final DateTime createdAt;
-  
+
   @HiveField(4)
   final DateTime updatedAt;
-  
+
+  @HiveField(5)
+  final bool isSynced;
+
+  @HiveField(6)
+  final bool isDeleted;
+
   JournalEntryModel({
     required this.id,
     required this.date,
     required this.content,
     required this.createdAt,
     required this.updatedAt,
+    this.isSynced = false,
+    this.isDeleted = false,
   });
-  
+
+  factory JournalEntryModel.fromJson(Map<String, dynamic> json) {
+    return JournalEntryModel(
+      id: json['id'] as String,
+      date: DateTime.parse(json['date'] as String),
+      content: json['content'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      isSynced: true,
+      isDeleted: json['isDeleted'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'date': date.toIso8601String(),
+      'content': content,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'isDeleted': isDeleted,
+    };
+  }
+
+  JournalEntryModel copyWith({
+    String? id,
+    DateTime? date,
+    String? content,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? isSynced,
+    bool? isDeleted,
+  }) {
+    return JournalEntryModel(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
+    );
+  }
+
   /// Convert domain entity to data model
   factory JournalEntryModel.fromEntity(JournalEntry entry) {
     return JournalEntryModel(
@@ -37,9 +88,11 @@ class JournalEntryModel extends HiveObject {
       content: entry.content,
       createdAt: entry.createdAt,
       updatedAt: entry.updatedAt,
+      isSynced: entry.isSynced,
+      isDeleted: entry.isDeleted,
     );
   }
-  
+
   /// Convert data model to domain entity
   JournalEntry toEntity() {
     return JournalEntry(
@@ -48,6 +101,8 @@ class JournalEntryModel extends HiveObject {
       content: content,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isSynced: isSynced,
+      isDeleted: isDeleted,
     );
   }
 }

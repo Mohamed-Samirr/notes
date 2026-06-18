@@ -12,7 +12,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
   final GetEntryByDateUseCase getEntryByDateUseCase;
   final SaveJournalEntryUseCase saveJournalEntryUseCase;
   final DeleteJournalEntryUseCase deleteJournalEntryUseCase;
-  
+
   JournalBloc({
     required this.getAllEntriesUseCase,
     required this.getEntryByDateUseCase,
@@ -24,7 +24,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
     on<SaveJournalEntryEvent>(_onSaveEntry);
     on<DeleteJournalEntryEvent>(_onDeleteEntry);
   }
-  
+
   /// Load all journal entries
   Future<void> _onLoadAllEntries(
     LoadAllEntriesEvent event,
@@ -38,7 +38,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
       emit(JournalError(message: 'Failed to load entries: ${e.toString()}'));
     }
   }
-  
+
   /// Load entry for a specific date
   Future<void> _onLoadEntryByDate(
     LoadEntryByDateEvent event,
@@ -52,7 +52,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
       emit(JournalError(message: 'Failed to load entry: ${e.toString()}'));
     }
   }
-  
+
   /// Save a journal entry
   Future<void> _onSaveEntry(
     SaveJournalEntryEvent event,
@@ -67,7 +67,7 @@ class JournalBloc extends Bloc<JournalEvent, JournalState> {
       emit(JournalError(message: 'Failed to save entry: ${e.toString()}'));
     }
   }
-  
+
   /// Delete a journal entry
   Future<void> _onDeleteEntry(
     DeleteJournalEntryEvent event,

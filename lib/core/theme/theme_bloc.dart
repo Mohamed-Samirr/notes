@@ -12,7 +12,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     on<LoadThemeEvent>(_onLoadTheme);
     on<ToggleThemeEvent>(_onToggleTheme);
   }
-  
+
   /// Load saved theme from local storage
   Future<void> _onLoadTheme(
     LoadThemeEvent event,
@@ -20,11 +20,13 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   ) async {
     try {
       final box = await Hive.openBox(AppConstants.settingsBox);
-      final themeModeIndex = box.get(
-        AppConstants.themeModeKey,
-        defaultValue: ThemeMode.system.index,
-      ) as int;
-      
+      final themeModeIndex =
+          box.get(
+                AppConstants.themeModeKey,
+                defaultValue: ThemeMode.system.index,
+              )
+              as int;
+
       final themeMode = ThemeMode.values[themeModeIndex];
       emit(ThemeState(themeMode: themeMode));
     } catch (e) {
@@ -32,7 +34,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       emit(const ThemeState(themeMode: ThemeMode.system));
     }
   }
-  
+
   /// Toggle between light and dark theme
   Future<void> _onToggleTheme(
     ToggleThemeEvent event,
@@ -42,10 +44,10 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       final newThemeMode = state.themeMode == ThemeMode.light
           ? ThemeMode.dark
           : ThemeMode.light;
-      
+
       final box = await Hive.openBox(AppConstants.settingsBox);
       await box.put(AppConstants.themeModeKey, newThemeMode.index);
-      
+
       emit(ThemeState(themeMode: newThemeMode));
     } catch (e) {
       // Keep current theme if error occurs

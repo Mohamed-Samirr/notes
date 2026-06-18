@@ -11,19 +11,21 @@ class ColorPalette {
     Color(0xFFEC4899), // Pink
     Color(0xFF06B6D4), // Cyan
   ];
-  
+
   /// Get color by index (rotates through the palette)
   static Color getColor(int index) {
     return colors[index % colors.length];
   }
-  
+
   /// Get color by ID (uses character sum for consistent colors)
   static Color getColorById(String id, {String prefix = ''}) {
     // Use sum of character codes for better distribution
     String fullId = prefix + id;
     int sum = 0;
     for (int i = 0; i < fullId.length; i++) {
-      sum += fullId.codeUnitAt(i) * (i + 1); // Multiply by position for more variety
+      sum +=
+          fullId.codeUnitAt(i) *
+          (i + 1); // Multiply by position for more variety
     }
     return colors[sum.abs() % colors.length];
   }

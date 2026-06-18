@@ -277,8 +277,58 @@ Possible improvements for the future:
 - [ ] Export/backup functionality
 - [ ] Reminders for to-do tasks
 - [ ] Rich text editor for journal
-- [ ] Cloud sync (optional)
 - [ ] Biometric authentication
+
+## Firebase Sync
+
+Hive remains the primary local database. Firebase is used only for cloud sync and backup, so the app continues to work normally when the user is offline or Firebase sync fails.
+
+### Setup
+
+1. Create a Firebase project.
+2. Enable Anonymous Authentication in Firebase Auth.
+3. Enable Cloud Firestore.
+4. Enable Firebase Storage.
+5. Configure the Flutter app with FlutterFire:
+
+```bash
+dart pub global activate flutterfire_cli
+flutterfire configure
+flutter pub get
+```
+
+Firebase initializes in `lib/main.dart`. Authentication is isolated in `lib/core/auth/auth_service.dart`, and features do not access `FirebaseAuth` directly.
+
+### Firestore Structure
+
+```text
+users
+  uid
+    notes
+      noteId
+    journal
+      entryId
+    todos
+      taskId
+```
+
+Note images upload to Firebase Storage:
+
+```text
+users/{uid}/images/{imageId}
+```
+
+### Sync Strategy
+
+- Save every create, update, and delete to Hive first.
+- Mark new and edited records as `isSynced = false`.
+- Use soft deletes with `isDeleted = true` before cloud deletion.
+- Try Firebase upload/delete after the local write.
+- Mark records as `isSynced = true` after successful cloud sync.
+- Keep local data unchanged when sync fails.
+- Listen for connectivity changes in `lib/core/services/sync_service.dart`.
+- Resolve conflicts with `updatedAt`; the newest version wins.
+- Keep note images offline through `localImagePath` and store cloud image URLs in `remoteImageUrl`.
 
 ## License
 

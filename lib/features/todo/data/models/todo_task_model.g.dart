@@ -22,13 +22,16 @@ class TodoTaskModelAdapter extends TypeAdapter<TodoTaskModel> {
       isCompleted: fields[2] as bool,
       date: fields[3] as DateTime,
       createdAt: fields[4] as DateTime,
+      updatedAt: (fields[5] as DateTime?) ?? (fields[4] as DateTime),
+      isSynced: fields[6] as bool? ?? false,
+      isDeleted: fields[7] as bool? ?? false,
     );
   }
 
   @override
   void write(BinaryWriter writer, TodoTaskModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +41,13 @@ class TodoTaskModelAdapter extends TypeAdapter<TodoTaskModel> {
       ..writeByte(3)
       ..write(obj.date)
       ..writeByte(4)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(5)
+      ..write(obj.updatedAt)
+      ..writeByte(6)
+      ..write(obj.isSynced)
+      ..writeByte(7)
+      ..write(obj.isDeleted);
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/todo_task.dart';
 import '../bloc/todo_bloc.dart';
@@ -76,7 +77,9 @@ class _TodoScreenState extends State<TodoScreen> {
                           icon: const Icon(Icons.chevron_left),
                           onPressed: () {
                             setState(() {
-                              _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                              _selectedDate = _selectedDate.subtract(
+                                const Duration(days: 1),
+                              );
                             });
                             _loadTasksForDate(_selectedDate);
                           },
@@ -85,7 +88,9 @@ class _TodoScreenState extends State<TodoScreen> {
                           icon: const Icon(Icons.chevron_right),
                           onPressed: () {
                             setState(() {
-                              _selectedDate = _selectedDate.add(const Duration(days: 1));
+                              _selectedDate = _selectedDate.add(
+                                const Duration(days: 1),
+                              );
                             });
                             _loadTasksForDate(_selectedDate);
                           },
@@ -103,9 +108,7 @@ class _TodoScreenState extends State<TodoScreen> {
             child: BlocBuilder<TodoBloc, TodoState>(
               builder: (context, state) {
                 if (state is TodoLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (state is TodoError) {
@@ -120,8 +123,12 @@ class _TodoScreenState extends State<TodoScreen> {
                 }
 
                 if (state is TodoLoaded) {
-                  final incompleteTasks = state.tasks.where((t) => !t.isCompleted).toList();
-                  final completedTasks = state.tasks.where((t) => t.isCompleted).toList();
+                  final incompleteTasks = state.tasks
+                      .where((t) => !t.isCompleted)
+                      .toList();
+                  final completedTasks = state.tasks
+                      .where((t) => t.isCompleted)
+                      .toList();
 
                   if (state.tasks.isEmpty) {
                     return Center(
@@ -164,11 +171,13 @@ class _TodoScreenState extends State<TodoScreen> {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
-                        ...incompleteTasks.map((task) => TodoItem(
-                          task: task,
-                          onToggle: () => _toggleTask(task.id),
-                          onDelete: () => _deleteTask(task.id),
-                        )),
+                        ...incompleteTasks.map(
+                          (task) => TodoItem(
+                            task: task,
+                            onToggle: () => _toggleTask(task.id),
+                            onDelete: () => _deleteTask(task.id),
+                          ),
+                        ),
                         const SizedBox(height: AppConstants.mediumPadding),
                       ],
 
@@ -180,16 +189,21 @@ class _TodoScreenState extends State<TodoScreen> {
                           ),
                           child: Text(
                             'Completed (${completedTasks.length})',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodySmall?.color,
+                                ),
                           ),
                         ),
-                        ...completedTasks.map((task) => TodoItem(
-                          task: task,
-                          onToggle: () => _toggleTask(task.id),
-                          onDelete: () => _deleteTask(task.id),
-                        )),
+                        ...completedTasks.map(
+                          (task) => TodoItem(
+                            task: task,
+                            onToggle: () => _toggleTask(task.id),
+                            onDelete: () => _deleteTask(task.id),
+                          ),
+                        ),
                       ],
                     ],
                   );
@@ -224,7 +238,9 @@ class _TodoScreenState extends State<TodoScreen> {
                         filled: true,
                         fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
+                          borderRadius: BorderRadius.circular(
+                            AppConstants.mediumRadius,
+                          ),
                           borderSide: BorderSide.none,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
@@ -270,12 +286,16 @@ class _TodoScreenState extends State<TodoScreen> {
     final title = _taskController.text.trim();
     if (title.isEmpty) return;
 
+    final now = DateTime.now();
     final task = TodoTask(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: const Uuid().v4(),
       title: title,
       isCompleted: false,
       date: _selectedDate,
-      createdAt: DateTime.now(),
+      createdAt: now,
+      updatedAt: now,
+      isSynced: false,
+      isDeleted: false,
     );
 
     context.read<TodoBloc>().add(AddTaskEvent(task: task));

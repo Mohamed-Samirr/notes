@@ -12,7 +12,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   final AddNoteUseCase addNoteUseCase;
   final UpdateNoteUseCase updateNoteUseCase;
   final DeleteNoteUseCase deleteNoteUseCase;
-  
+
   NotesBloc({
     required this.getAllNotesUseCase,
     required this.addNoteUseCase,
@@ -24,7 +24,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<UpdateNoteEvent>(_onUpdateNote);
     on<DeleteNoteEvent>(_onDeleteNote);
   }
-  
+
   /// Load all notes
   Future<void> _onLoadNotes(
     LoadNotesEvent event,
@@ -38,12 +38,9 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(NotesError(message: 'Failed to load notes: ${e.toString()}'));
     }
   }
-  
+
   /// Add a new note
-  Future<void> _onAddNote(
-    AddNoteEvent event,
-    Emitter<NotesState> emit,
-  ) async {
+  Future<void> _onAddNote(AddNoteEvent event, Emitter<NotesState> emit) async {
     try {
       await addNoteUseCase(event.note);
       // Reload notes after adding
@@ -53,7 +50,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(NotesError(message: 'Failed to add note: ${e.toString()}'));
     }
   }
-  
+
   /// Update an existing note
   Future<void> _onUpdateNote(
     UpdateNoteEvent event,
@@ -68,7 +65,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
       emit(NotesError(message: 'Failed to update note: ${e.toString()}'));
     }
   }
-  
+
   /// Delete a note
   Future<void> _onDeleteNote(
     DeleteNoteEvent event,

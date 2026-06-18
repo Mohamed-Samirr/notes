@@ -23,9 +23,7 @@ class TodoItem extends StatelessWidget {
         leading: Checkbox(
           value: task.isCompleted,
           onChanged: (_) => onToggle(),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         ),
         title: Text(
           task.title,

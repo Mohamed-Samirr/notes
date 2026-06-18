@@ -7,44 +7,74 @@ class TodoLocalDataSource {
   Future<Box<TodoTaskModel>> _getBox() async {
     return await Hive.openBox<TodoTaskModel>(AppConstants.todoBox);
   }
-  
+
   /// Get all tasks
   Future<List<TodoTaskModel>> getAllTasks() async {
     final box = await _getBox();
+    return box.values.where((task) => !task.isDeleted).toList();
+  }
+
+  Future<List<TodoTaskModel>> getAllTasksIncludingDeleted() async {
+    final box = await _getBox();
     return box.values.toList();
   }
-  
+
+  Future<List<TodoTaskModel>> getUnsyncedTasks() async {
+    final box = await _getBox();
+    return box.values.where((task) => !task.isSynced).toList();
+  }
+
   /// Get tasks by date (normalized to day)
   Future<List<TodoTaskModel>> getTasksByDate(DateTime date) async {
     final box = await _getBox();
     final normalizedDate = DateTime(date.year, date.month, date.day);
-    
+
     return box.values.where((task) {
+      if (task.isDeleted) return false;
       final taskDate = DateTime(task.date.year, task.date.month, task.date.day);
       return taskDate == normalizedDate;
     }).toList();
   }
-  
+
   /// Get a specific task by ID
   Future<TodoTaskModel?> getTaskById(String id) async {
     final box = await _getBox();
     return box.get(id);
   }
-  
+
   /// Add a new task
   Future<void> addTask(TodoTaskModel task) async {
     final box = await _getBox();
     await box.put(task.id, task);
   }
-  
+
   /// Update an existing task
   Future<void> updateTask(TodoTaskModel task) async {
     final box = await _getBox();
     await box.put(task.id, task);
   }
-  
-  /// Delete a task
+
+  Future<void> upsertTask(TodoTaskModel task) async {
+    final box = await _getBox();
+    await box.put(task.id, task);
+  }
+
+  /// Soft delete a task
   Future<void> deleteTask(String id) async {
+    final box = await _getBox();
+    final task = box.get(id);
+    if (task == null) return;
+    await box.put(
+      id,
+      task.copyWith(
+        updatedAt: DateTime.now(),
+        isSynced: false,
+        isDeleted: true,
+      ),
+    );
+  }
+
+  Future<void> permanentlyDeleteTask(String id) async {
     final box = await _getBox();
     await box.delete(id);
   }

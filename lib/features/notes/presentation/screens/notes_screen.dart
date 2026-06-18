@@ -25,28 +25,22 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notes'),
-      ),
+      appBar: AppBar(title: const Text('Notes')),
       body: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
           if (state is NotesLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (state is NotesError) {
             return Center(
               child: Text(
                 state.message,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
-                ),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             );
           }
-          
+
           if (state is NotesLoaded) {
             if (state.notes.isEmpty) {
               return Center(
@@ -72,7 +66,7 @@ class _NotesScreenState extends State<NotesScreen> {
                 ),
               );
             }
-            
+
             return ListView.builder(
               padding: const EdgeInsets.all(AppConstants.mediumPadding),
               itemCount: state.notes.length,
@@ -86,7 +80,7 @@ class _NotesScreenState extends State<NotesScreen> {
               },
             );
           }
-          
+
           return const SizedBox.shrink();
         },
       ),
@@ -96,25 +90,21 @@ class _NotesScreenState extends State<NotesScreen> {
       ),
     );
   }
-  
+
   void _navigateToAddNote(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddEditNoteScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddEditNoteScreen()),
     );
   }
-  
+
   void _navigateToEditNote(BuildContext context, Note note) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddEditNoteScreen(note: note),
-      ),
+      MaterialPageRoute(builder: (context) => AddEditNoteScreen(note: note)),
     );
   }
-  
+
   void _deleteNote(BuildContext context, String noteId) {
     showDialog(
       context: context,
@@ -133,9 +123,7 @@ class _NotesScreenState extends State<NotesScreen> {
             },
             child: Text(
               'Delete',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
         ],

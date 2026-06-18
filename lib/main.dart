@@ -1,21 +1,29 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'core/auth/auth_service.dart';
 import 'core/constants/app_constants.dart';
+import 'core/services/sync_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_bloc.dart';
 import 'features/common/presentation/screens/home_screen.dart';
 import 'features/notes/data/datasources/notes_local_data_source.dart';
+import 'features/notes/data/datasources/notes_remote_data_source.dart';
 import 'features/notes/data/models/note_model.dart';
 import 'features/notes/data/repositories/notes_repository_impl.dart';
 import 'features/notes/domain/usecases/notes_usecases.dart';
 import 'features/notes/presentation/bloc/notes_bloc.dart';
 import 'features/journal/data/datasources/journal_local_data_source.dart';
+import 'features/journal/data/datasources/journal_remote_data_source.dart';
 import 'features/journal/data/models/journal_entry_model.dart';
 import 'features/journal/data/repositories/journal_repository_impl.dart';
 import 'features/journal/domain/usecases/journal_usecases.dart';
 import 'features/journal/presentation/bloc/journal_bloc.dart';
 import 'features/todo/data/datasources/todo_local_data_source.dart';
+import 'features/todo/data/datasources/todo_remote_data_source.dart';
 import 'features/todo/data/models/todo_task_model.dart';
 import 'features/todo/data/repositories/todo_repository_impl.dart';
 import 'features/todo/domain/usecases/todo_usecases.dart';
@@ -23,20 +31,80 @@ import 'features/todo/presentation/bloc/todo_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive
   await Hive.initFlutter();
-  
+
   // Register Hive adapters
   Hive.registerAdapter(NoteModelAdapter());
   Hive.registerAdapter(JournalEntryModelAdapter());
   Hive.registerAdapter(TodoTaskModelAdapter());
-  
-  runApp(const MyApp());
+
+  final notesLocalDataSource = NotesLocalDataSource();
+  final journalLocalDataSource = JournalLocalDataSource();
+  final todoLocalDataSource = TodoLocalDataSource();
+
+  NotesRemoteDataSource? notesRemoteDataSource;
+  JournalRemoteDataSource? journalRemoteDataSource;
+  TodoRemoteDataSource? todoRemoteDataSource;
+
+  try {
+    await Firebase.initializeApp();
+
+    final authService = AuthService();
+    await authService.signInAnonymously();
+
+    notesRemoteDataSource = NotesRemoteDataSourceImpl(authService: authService);
+    journalRemoteDataSource = JournalRemoteDataSourceImpl(
+      authService: authService,
+    );
+    todoRemoteDataSource = TodoRemoteDataSourceImpl(authService: authService);
+
+    final syncService = SyncService(
+      notesLocalDataSource: notesLocalDataSource,
+      notesRemoteDataSource: notesRemoteDataSource,
+      journalLocalDataSource: journalLocalDataSource,
+      journalRemoteDataSource: journalRemoteDataSource,
+      todoLocalDataSource: todoLocalDataSource,
+      todoRemoteDataSource: todoRemoteDataSource,
+    );
+    await syncService.start();
+  } catch (error) {
+    log('Firebase sync disabled; app will continue local-first.', error: error);
+    notesRemoteDataSource = null;
+    journalRemoteDataSource = null;
+    todoRemoteDataSource = null;
+  }
+
+  runApp(
+    MyApp(
+      notesLocalDataSource: notesLocalDataSource,
+      notesRemoteDataSource: notesRemoteDataSource,
+      journalLocalDataSource: journalLocalDataSource,
+      journalRemoteDataSource: journalRemoteDataSource,
+      todoLocalDataSource: todoLocalDataSource,
+      todoRemoteDataSource: todoRemoteDataSource,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final NotesLocalDataSource notesLocalDataSource;
+  final NotesRemoteDataSource? notesRemoteDataSource;
+  final JournalLocalDataSource journalLocalDataSource;
+  final JournalRemoteDataSource? journalRemoteDataSource;
+  final TodoLocalDataSource todoLocalDataSource;
+  final TodoRemoteDataSource? todoRemoteDataSource;
+
+  const MyApp({
+    super.key,
+    required this.notesLocalDataSource,
+    required this.notesRemoteDataSource,
+    required this.journalLocalDataSource,
+    required this.journalRemoteDataSource,
+    required this.todoLocalDataSource,
+    required this.todoRemoteDataSource,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +114,14 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => ThemeBloc()..add(const LoadThemeEvent()),
         ),
-        
+
         // Notes BLoC
         BlocProvider(
           create: (context) {
-            final dataSource = NotesLocalDataSource();
-            final repository = NotesRepositoryImpl(dataSource);
+            final repository = NotesRepositoryImpl(
+              notesLocalDataSource,
+              remoteDataSource: notesRemoteDataSource,
+            );
             return NotesBloc(
               getAllNotesUseCase: GetAllNotesUseCase(repository),
               addNoteUseCase: AddNoteUseCase(repository),
@@ -60,12 +130,14 @@ class MyApp extends StatelessWidget {
             );
           },
         ),
-        
+
         // Journal BLoC
         BlocProvider(
           create: (context) {
-            final dataSource = JournalLocalDataSource();
-            final repository = JournalRepositoryImpl(dataSource);
+            final repository = JournalRepositoryImpl(
+              journalLocalDataSource,
+              remoteDataSource: journalRemoteDataSource,
+            );
             return JournalBloc(
               getAllEntriesUseCase: GetAllEntriesUseCase(repository),
               getEntryByDateUseCase: GetEntryByDateUseCase(repository),
@@ -74,19 +146,23 @@ class MyApp extends StatelessWidget {
             );
           },
         ),
-        
+
         // ToDo BLoC
         BlocProvider(
           create: (context) {
-            final dataSource = TodoLocalDataSource();
-            final repository = TodoRepositoryImpl(dataSource);
+            final repository = TodoRepositoryImpl(
+              todoLocalDataSource,
+              remoteDataSource: todoRemoteDataSource,
+            );
             return TodoBloc(
               getAllTasksUseCase: GetAllTasksUseCase(repository),
               getTasksByDateUseCase: GetTasksByDateUseCase(repository),
               addTaskUseCase: AddTaskUseCase(repository),
               updateTaskUseCase: UpdateTaskUseCase(repository),
               deleteTaskUseCase: DeleteTaskUseCase(repository),
-              toggleTaskCompletionUseCase: ToggleTaskCompletionUseCase(repository),
+              toggleTaskCompletionUseCase: ToggleTaskCompletionUseCase(
+                repository,
+              ),
             );
           },
         ),
