@@ -288,7 +288,7 @@ Hive remains the primary local database. Firebase is used only for cloud sync an
 1. Create a Firebase project.
 2. Enable Anonymous Authentication in Firebase Auth.
 3. Enable Cloud Firestore.
-4. Enable Firebase Storage.
+
 5. Configure the Flutter app with FlutterFire:
 
 ```bash
@@ -312,11 +312,7 @@ users
       taskId
 ```
 
-Note images upload to Firebase Storage:
 
-```text
-users/{uid}/images/{imageId}
-```
 
 ### Sync Strategy
 
@@ -328,7 +324,7 @@ users/{uid}/images/{imageId}
 - Keep local data unchanged when sync fails.
 - Listen for connectivity changes in `lib/core/services/sync_service.dart`.
 - Resolve conflicts with `updatedAt`; the newest version wins.
-- Keep note images offline through `localImagePath` and store cloud image URLs in `remoteImageUrl`.
+- Keep note images offline using `localImagePath` only.
 
 ## License
 

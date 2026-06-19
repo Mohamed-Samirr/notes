@@ -22,8 +22,8 @@ class JournalEntryModelAdapter extends TypeAdapter<JournalEntryModel> {
       content: fields[2] as String,
       createdAt: fields[3] as DateTime,
       updatedAt: fields[4] as DateTime,
-      isSynced: fields[5] as bool? ?? false,
-      isDeleted: fields[6] as bool? ?? false,
+      isSynced: fields[5] as bool,
+      isDeleted: fields[6] as bool,
     );
   }
 

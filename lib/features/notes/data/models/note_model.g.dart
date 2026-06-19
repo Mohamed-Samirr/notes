@@ -23,17 +23,16 @@ class NoteModelAdapter extends TypeAdapter<NoteModel> {
       imagePath: fields[3] as String?,
       createdAt: fields[4] as DateTime,
       updatedAt: fields[5] as DateTime,
-      isSynced: fields[6] as bool? ?? false,
-      isDeleted: fields[7] as bool? ?? false,
-      localImagePath: (fields[8] as String?) ?? (fields[3] as String?),
-      remoteImageUrl: fields[9] as String?,
+      isSynced: fields[6] as bool,
+      isDeleted: fields[7] as bool,
+      localImagePath: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, NoteModel obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -51,9 +50,7 @@ class NoteModelAdapter extends TypeAdapter<NoteModel> {
       ..writeByte(7)
       ..write(obj.isDeleted)
       ..writeByte(8)
-      ..write(obj.localImagePath)
-      ..writeByte(9)
-      ..write(obj.remoteImageUrl);
+      ..write(obj.localImagePath);
   }
 
   @override

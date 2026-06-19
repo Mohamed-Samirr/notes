@@ -22,9 +22,9 @@ class TodoTaskModelAdapter extends TypeAdapter<TodoTaskModel> {
       isCompleted: fields[2] as bool,
       date: fields[3] as DateTime,
       createdAt: fields[4] as DateTime,
-      updatedAt: (fields[5] as DateTime?) ?? (fields[4] as DateTime),
-      isSynced: fields[6] as bool? ?? false,
-      isDeleted: fields[7] as bool? ?? false,
+      updatedAt: fields[5] as DateTime,
+      isSynced: fields[6] as bool,
+      isDeleted: fields[7] as bool,
     );
   }
 

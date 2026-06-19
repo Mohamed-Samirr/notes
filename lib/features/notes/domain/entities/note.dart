@@ -7,7 +7,7 @@ class Note extends Equatable {
   final String description;
   final String? imagePath;
   final String? localImagePath;
-  final String? remoteImageUrl;
+
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isSynced;
@@ -19,7 +19,7 @@ class Note extends Equatable {
     required this.description,
     this.imagePath,
     this.localImagePath,
-    this.remoteImageUrl,
+
     required this.createdAt,
     required this.updatedAt,
     this.isSynced = false,
@@ -32,7 +32,7 @@ class Note extends Equatable {
     String? description,
     String? imagePath,
     String? localImagePath,
-    String? remoteImageUrl,
+
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isSynced,
@@ -44,7 +44,7 @@ class Note extends Equatable {
       description: description ?? this.description,
       imagePath: imagePath ?? this.imagePath,
       localImagePath: localImagePath ?? this.localImagePath,
-      remoteImageUrl: remoteImageUrl ?? this.remoteImageUrl,
+
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isSynced: isSynced ?? this.isSynced,
@@ -59,7 +59,7 @@ class Note extends Equatable {
     description,
     imagePath,
     localImagePath,
-    remoteImageUrl,
+
     createdAt,
     updatedAt,
     isSynced,

@@ -167,7 +167,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         description: _descriptionController.text.trim(),
         imagePath: _imagePath,
         localImagePath: _imagePath,
-        remoteImageUrl: _isEditing ? widget.note!.remoteImageUrl : null,
+
         createdAt: _isEditing ? widget.note!.createdAt : now,
         updatedAt: now,
         isSynced: false,

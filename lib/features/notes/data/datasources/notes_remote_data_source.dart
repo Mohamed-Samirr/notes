@@ -1,7 +1,5 @@
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
-import 'package:firebase_storage/firebase_storage.dart' as storage;
 
 import '../../../../core/auth/auth_service.dart';
 import '../../../../core/error/exceptions.dart';
@@ -15,26 +13,22 @@ abstract class NotesRemoteDataSource {
 
 class NotesRemoteDataSourceImpl implements NotesRemoteDataSource {
   final firestore.FirebaseFirestore _firestore;
-  final storage.FirebaseStorage _storage;
+
   final AuthService _authService;
 
   NotesRemoteDataSourceImpl({
     firestore.FirebaseFirestore? firestoreInstance,
-    storage.FirebaseStorage? storageInstance,
+
     required AuthService authService,
   }) : _firestore = firestoreInstance ?? firestore.FirebaseFirestore.instance,
-       _storage = storageInstance ?? storage.FirebaseStorage.instance,
        _authService = authService;
 
   @override
   Future<NoteModel> uploadNote(NoteModel note) async {
     try {
       final uid = await _authService.getCurrentUid();
-      final remoteImageUrl = await _uploadImageIfNeeded(uid, note);
-      final syncedNote = note.copyWith(remoteImageUrl: remoteImageUrl);
-
-      await _collection(uid).doc(note.id).set(syncedNote.toJson());
-      return syncedNote;
+      await _collection(uid).doc(note.id).set(note.toJson());
+      return note;
     } catch (error) {
       throw FirebaseException('Failed to upload note ${note.id}: $error');
     }
@@ -67,18 +61,5 @@ class NotesRemoteDataSourceImpl implements NotesRemoteDataSource {
     return _firestore.collection('users').doc(uid).collection('notes');
   }
 
-  Future<String?> _uploadImageIfNeeded(String uid, NoteModel note) async {
-    final localPath = note.localImagePath ?? note.imagePath;
-    if (localPath == null || localPath.isEmpty) return note.remoteImageUrl;
-    if (note.remoteImageUrl != null && note.remoteImageUrl!.isNotEmpty) {
-      return note.remoteImageUrl;
-    }
 
-    final file = File(localPath);
-    if (!file.existsSync()) return note.remoteImageUrl;
-
-    final imageRef = _storage.ref('users/$uid/images/${note.id}');
-    await imageRef.putFile(file);
-    return imageRef.getDownloadURL();
-  }
 }

@@ -33,8 +33,6 @@ class NoteModel extends HiveObject {
   @HiveField(8)
   final String? localImagePath;
 
-  @HiveField(9)
-  final String? remoteImageUrl;
 
   NoteModel({
     required this.id,
@@ -46,7 +44,7 @@ class NoteModel extends HiveObject {
     this.isSynced = false,
     this.isDeleted = false,
     String? localImagePath,
-    this.remoteImageUrl,
+
   }) : localImagePath = localImagePath ?? imagePath;
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
@@ -56,7 +54,7 @@ class NoteModel extends HiveObject {
       description: json['description'] as String? ?? '',
       imagePath: json['localImagePath'] as String?,
       localImagePath: json['localImagePath'] as String?,
-      remoteImageUrl: json['remoteImageUrl'] as String?,
+
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       isSynced: true,
@@ -70,7 +68,7 @@ class NoteModel extends HiveObject {
       'title': title,
       'description': description,
       'localImagePath': localImagePath,
-      'remoteImageUrl': remoteImageUrl,
+
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'isDeleted': isDeleted,
@@ -83,7 +81,7 @@ class NoteModel extends HiveObject {
     String? description,
     String? imagePath,
     String? localImagePath,
-    String? remoteImageUrl,
+
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isSynced,
@@ -95,7 +93,7 @@ class NoteModel extends HiveObject {
       description: description ?? this.description,
       imagePath: imagePath ?? this.imagePath,
       localImagePath: localImagePath ?? this.localImagePath,
-      remoteImageUrl: remoteImageUrl ?? this.remoteImageUrl,
+
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isSynced: isSynced ?? this.isSynced,
@@ -111,7 +109,7 @@ class NoteModel extends HiveObject {
       description: note.description,
       imagePath: note.localImagePath ?? note.imagePath,
       localImagePath: note.localImagePath ?? note.imagePath,
-      remoteImageUrl: note.remoteImageUrl,
+
       createdAt: note.createdAt,
       updatedAt: note.updatedAt,
       isSynced: note.isSynced,
@@ -127,7 +125,7 @@ class NoteModel extends HiveObject {
       description: description,
       imagePath: localImagePath ?? imagePath,
       localImagePath: localImagePath ?? imagePath,
-      remoteImageUrl: remoteImageUrl,
+
       createdAt: createdAt,
       updatedAt: updatedAt,
       isSynced: isSynced,
