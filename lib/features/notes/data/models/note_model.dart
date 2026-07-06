@@ -48,6 +48,10 @@ class NoteModel extends HiveObject {
   }) : localImagePath = localImagePath ?? imagePath;
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
+    // Tombstone docs may only carry id/isDeleted/updatedAt.
+    final updatedAt =
+        DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
+        DateTime.fromMillisecondsSinceEpoch(0);
     return NoteModel(
       id: json['id'] as String,
       title: json['title'] as String? ?? '',
@@ -55,8 +59,9 @@ class NoteModel extends HiveObject {
       imagePath: json['localImagePath'] as String?,
       localImagePath: json['localImagePath'] as String?,
 
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt:
+          DateTime.tryParse(json['createdAt'] as String? ?? '') ?? updatedAt,
+      updatedAt: updatedAt,
       isSynced: true,
       isDeleted: json['isDeleted'] as bool? ?? false,
     );

@@ -51,7 +51,13 @@ class NotesRemoteDataSourceImpl implements NotesRemoteDataSource {
   Future<void> deleteNote(String id) async {
     try {
       final uid = await _authService.getCurrentUid();
-      await _collection(uid).doc(id).delete();
+      // Tombstone instead of hard delete so other devices see the deletion
+      // and don't re-upload their stale copy.
+      await _collection(uid).doc(id).set({
+        'id': id,
+        'isDeleted': true,
+        'updatedAt': DateTime.now().toIso8601String(),
+      }, firestore.SetOptions(merge: true));
     } catch (error) {
       throw FirebaseException('Failed to delete remote note $id: $error');
     }

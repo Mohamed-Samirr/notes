@@ -42,13 +42,18 @@ class TodoTaskModel extends HiveObject {
   });
 
   factory TodoTaskModel.fromJson(Map<String, dynamic> json) {
+    // Tombstone docs may only carry id/isDeleted/updatedAt.
+    final updatedAt =
+        DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
+        DateTime.fromMillisecondsSinceEpoch(0);
     return TodoTaskModel(
       id: json['id'] as String,
       title: json['title'] as String? ?? '',
       isCompleted: json['isCompleted'] as bool? ?? false,
-      date: DateTime.parse(json['date'] as String),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      date: DateTime.tryParse(json['date'] as String? ?? '') ?? updatedAt,
+      createdAt:
+          DateTime.tryParse(json['createdAt'] as String? ?? '') ?? updatedAt,
+      updatedAt: updatedAt,
       isSynced: true,
       isDeleted: json['isDeleted'] as bool? ?? false,
     );

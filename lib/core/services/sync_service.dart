@@ -78,11 +78,18 @@ class SyncService {
         .getAllNotesIncludingDeleted();
     final remoteNotes = await _notesRemoteDataSource.getNotes();
     final remoteById = {for (final note in remoteNotes) note.id: note};
+    final tombstonedIds = <String>{};
 
     for (final local in localNotes) {
       if (local.isDeleted) {
-        await _notesRemoteDataSource.deleteNote(local.id);
-        await _notesLocalDataSource.permanentlyDeleteNote(local.id);
+        final remote = remoteById[local.id];
+        // Last-write-wins: a remote edit newer than the local deletion
+        // survives; the merge pass below restores it locally.
+        if (remote == null || !remote.updatedAt.isAfter(local.updatedAt)) {
+          await _notesRemoteDataSource.deleteNote(local.id);
+          await _notesLocalDataSource.permanentlyDeleteNote(local.id);
+          tombstonedIds.add(local.id);
+        }
         continue;
       }
 
@@ -100,6 +107,10 @@ class SyncService {
     };
 
     for (final remote in remoteNotes) {
+      // remoteNotes predates the deletions pushed above; skip those ids so a
+      // stale live copy doesn't get restored.
+      if (tombstonedIds.contains(remote.id)) continue;
+
       final local = refreshedLocalById[remote.id];
       if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
         if (remote.isDeleted) {
@@ -118,11 +129,18 @@ class SyncService {
         .getAllEntriesIncludingDeleted();
     final remoteEntries = await _journalRemoteDataSource.getEntries();
     final remoteById = {for (final entry in remoteEntries) entry.id: entry};
+    final tombstonedIds = <String>{};
 
     for (final local in localEntries) {
       if (local.isDeleted) {
-        await _journalRemoteDataSource.deleteEntry(local.id);
-        await _journalLocalDataSource.permanentlyDeleteEntry(local.id);
+        final remote = remoteById[local.id];
+        // Last-write-wins: a remote edit newer than the local deletion
+        // survives; the merge pass below restores it locally.
+        if (remote == null || !remote.updatedAt.isAfter(local.updatedAt)) {
+          await _journalRemoteDataSource.deleteEntry(local.id);
+          await _journalLocalDataSource.permanentlyDeleteEntry(local.id);
+          tombstonedIds.add(local.id);
+        }
         continue;
       }
 
@@ -135,17 +153,22 @@ class SyncService {
       }
     }
 
-    await _mergeRemoteJournal(remoteEntries);
+    await _mergeRemoteJournal(remoteEntries, tombstonedIds);
   }
 
   Future<void> _mergeRemoteJournal(
     List<JournalEntryModel> remoteEntries,
+    Set<String> tombstonedIds,
   ) async {
     final refreshedLocal = await _journalLocalDataSource
         .getAllEntriesIncludingDeleted();
     final localById = {for (final entry in refreshedLocal) entry.id: entry};
 
     for (final remote in remoteEntries) {
+      // remoteEntries predates the deletions pushed above; skip those ids so
+      // a stale live copy doesn't get restored.
+      if (tombstonedIds.contains(remote.id)) continue;
+
       final local = localById[remote.id];
       if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
         if (remote.isDeleted) {
@@ -163,11 +186,18 @@ class SyncService {
     final localTasks = await _todoLocalDataSource.getAllTasksIncludingDeleted();
     final remoteTasks = await _todoRemoteDataSource.getTasks();
     final remoteById = {for (final task in remoteTasks) task.id: task};
+    final tombstonedIds = <String>{};
 
     for (final local in localTasks) {
       if (local.isDeleted) {
-        await _todoRemoteDataSource.deleteTask(local.id);
-        await _todoLocalDataSource.permanentlyDeleteTask(local.id);
+        final remote = remoteById[local.id];
+        // Last-write-wins: a remote edit newer than the local deletion
+        // survives; the merge pass below restores it locally.
+        if (remote == null || !remote.updatedAt.isAfter(local.updatedAt)) {
+          await _todoRemoteDataSource.deleteTask(local.id);
+          await _todoLocalDataSource.permanentlyDeleteTask(local.id);
+          tombstonedIds.add(local.id);
+        }
         continue;
       }
 
@@ -178,15 +208,22 @@ class SyncService {
       }
     }
 
-    await _mergeRemoteTodos(remoteTasks);
+    await _mergeRemoteTodos(remoteTasks, tombstonedIds);
   }
 
-  Future<void> _mergeRemoteTodos(List<TodoTaskModel> remoteTasks) async {
+  Future<void> _mergeRemoteTodos(
+    List<TodoTaskModel> remoteTasks,
+    Set<String> tombstonedIds,
+  ) async {
     final refreshedLocal = await _todoLocalDataSource
         .getAllTasksIncludingDeleted();
     final localById = {for (final task in refreshedLocal) task.id: task};
 
     for (final remote in remoteTasks) {
+      // remoteTasks predates the deletions pushed above; skip those ids so a
+      // stale live copy doesn't get restored.
+      if (tombstonedIds.contains(remote.id)) continue;
+
       final local = localById[remote.id];
       if (local == null || remote.updatedAt.isAfter(local.updatedAt)) {
         if (remote.isDeleted) {

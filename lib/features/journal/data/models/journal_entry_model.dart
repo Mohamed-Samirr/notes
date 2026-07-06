@@ -38,12 +38,17 @@ class JournalEntryModel extends HiveObject {
   });
 
   factory JournalEntryModel.fromJson(Map<String, dynamic> json) {
+    // Tombstone docs may only carry id/isDeleted/updatedAt.
+    final updatedAt =
+        DateTime.tryParse(json['updatedAt'] as String? ?? '') ??
+        DateTime.fromMillisecondsSinceEpoch(0);
     return JournalEntryModel(
       id: json['id'] as String,
-      date: DateTime.parse(json['date'] as String),
+      date: DateTime.tryParse(json['date'] as String? ?? '') ?? updatedAt,
       content: json['content'] as String? ?? '',
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt:
+          DateTime.tryParse(json['createdAt'] as String? ?? '') ?? updatedAt,
+      updatedAt: updatedAt,
       isSynced: true,
       isDeleted: json['isDeleted'] as bool? ?? false,
     );
